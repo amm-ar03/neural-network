@@ -49,4 +49,70 @@ class Neural_Network:
                 sum_o1 = self.w5 * x[0] + self.w6 * x[1] + self.b3
                 o1 = sigmoid(sum_o1)
                 y_pred = o1
+                #partial derivative
+                L_ypred = -2 * (y_true - y_pred)
+
+                #Neuron o1
+                ypred_w5 = h1 * deriv_sigmoid(sum_o1)
+                ypred_w6 = h2 * deriv_sigmoid(sum_o1)
+                ypred_b3 = deriv_sigmoid(sum_o1)
+
+                y_pred_h1 = self.w5 * deriv_sigmoid(sum_o1)
+                y_pred_h2 = self.w6 * deriv_sigmoid(sum_o1)
+
+                #Neuron h1
+                h1_w1 = x[0] * deriv_sigmoid(sum_h1)
+                h1_w2 = x[1] * deriv_sigmoid(sum_h1)
+                h1_b1 = deriv_sigmoid(sum_h1)
+
+                #Neuron h2
+                h2_w3 = x[0] * deriv_sigmoid(sum_h2)
+                h2_w4 = x[1] * deriv_sigmoid(sum_h2)
+                h2_b2 = deriv_sigmoid(sum_h2)
+
+                #Updating weights and biases
+                #Neuron h1
+                self.w1 -= learn_rate * L_ypred * y_pred_h1 * h1_w1
+                self.w2 -= learn_rate * L_ypred * y_pred_h1 * h1_w2
+                self.b1 -= learn_rate * L_ypred * y_pred_h1 * h1_b1
+
+                #Neuron h2
+                self.w3 -= learn_rate * L_ypred * y_pred_h2 * h2_w3
+                self.w4 -= learn_rate * L_ypred * y_pred_h2 * h2_w4
+                self.b2 -= learn_rate * L_ypred * y_pred_h2 * h2_b2
+
+                #Neuron o1
+                self.w5 -= learn_rate * L_ypred * ypred_w5
+                self.w6 -= learn_rate * L_ypred * ypred_w6
+                self.b3 -= learn_rate * L_ypred * ypred_b3
+
+                #This calculates total loss at end of each epoch 
+            if epoch % 10 == 0:
+                y_pred = np.apply_along_axis(self.feedforward, 1, data)
+                loss = mse_loss(all_y_trues, y_pred)
+                print("Epoch %d loss: %.3f" % (epoch, loss))
+
+data = np.array([
+    [-7, -3], #person 1
+    [40, 4], #person 2
+    [-7, 3], #person 3 
+    [120, 9], #person 4
+])
+all_y_trues = np.array([
+    1,
+    0,
+    0,
+    0,
+])
+
+network = Neural_Network()
+network.train(data, all_y_trues)
+
+#shift amounts chosen is 135 pounds and 66 inches 
+
+mike_wazowski = np.array([6, -6]) #141 pounds, 60 inches
+phineas = np.array([19, 3]) #154 pounds, 69 inches
+
+print("Mike Wazowski: %.3f " % network.feedforward(mike_wazowski))
+print("Phineas: %.3f " % network.feedforward(phineas))
                 
